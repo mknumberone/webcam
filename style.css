@@ -1,0 +1,506 @@
+/* ========================================
+   XUÂN TRONG TẦM TAY - Styles
+   ======================================== */
+
+:root {
+    /* Colors - Tết Theme */
+    --red-primary: #d62828;
+    --red-dark: #9b2226;
+    --gold-primary: #f4a300;
+    --gold-light: #ffd700;
+    --pink-blossom: #ffb3c6;
+    --pink-light: #ffe5ec;
+    --bg-dark: #1a0a0a;
+    --bg-gradient: linear-gradient(135deg, #1a0a0a 0%, #2d1515 50%, #1a0a0a 100%);
+
+    /* Glass Effect */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+    /* Typography */
+    --font-display: 'Playfair Display', serif;
+    --font-script: 'Dancing Script', cursive;
+    --font-body: 'Be Vietnam Pro', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background: var(--bg-dark);
+    color: white;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ========================================
+   CANVAS & VIDEO
+   ======================================== */
+
+#canvas3d {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#webcam {
+    display: none;
+}
+
+/* Camera Preview - Bottom Right Corner */
+#camera-preview {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+    height: 150px;
+    border-radius: 16px;
+    overflow: hidden;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#camera-preview.visible {
+    opacity: 1;
+}
+
+#hand-canvas {
+    width: 100%;
+    height: 100%;
+    transform: scaleX(-1);
+}
+
+.camera-label {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+
+/* ========================================
+   LOADING SCREEN
+   ======================================== */
+
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader {
+    text-align: center;
+}
+
+.blossom-loader {
+    font-size: 64px;
+    animation: float 2s ease-in-out infinite, spin 4s linear infinite;
+}
+
+.loader h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    margin: 20px 0 10px;
+    background: linear-gradient(135deg, var(--gold-light), var(--pink-blossom));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.loader p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   MODALS
+   ======================================== */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.modal-content {
+    padding: 40px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: modalSlideIn 0.4s ease;
+}
+
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--gold-light), var(--pink-blossom));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-content p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+}
+
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-family: var(--font-body);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modal-content input[type="text"]:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 20px rgba(244, 163, 0, 0.3);
+}
+
+.modal-content input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Camera Select */
+.camera-select {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.camera-select label {
+    display: block;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 8px;
+}
+
+.camera-select select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.camera-select select:focus {
+    border-color: var(--gold-primary);
+}
+
+.camera-select select option {
+    background: #2d1515;
+    color: white;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    display: inline-block;
+    width: 100%;
+    padding: 14px 30px;
+    font-size: 16px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, #4a5568, #2d3748);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-secondary.success {
+    background: linear-gradient(135deg, #38a169, #276749);
+}
+
+/* Camera Status */
+.camera-status {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    text-align: center;
+    min-height: 20px;
+}
+
+.camera-status.success {
+    background: rgba(56, 161, 105, 0.2);
+    color: #68d391;
+}
+
+.camera-status.error {
+    background: rgba(245, 101, 101, 0.2);
+    color: #fc8181;
+}
+
+/* Primary Button */
+.btn-primary {
+    display: inline-block;
+    padding: 16px 40px;
+    font-size: 18px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, var(--red-primary), var(--red-dark));
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(214, 40, 40, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(214, 40, 40, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* ========================================
+   GESTURE GUIDE
+   ======================================== */
+
+#gesture-guide {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#gesture-guide.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.guide-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.guide-item:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.guide-item.active {
+    background: rgba(244, 163, 0, 0.3);
+    border-color: var(--gold-primary);
+}
+
+.gesture-icon {
+    font-size: 28px;
+}
+
+.gesture-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========================================
+   GESTURE INDICATOR
+   ======================================== */
+
+#gesture-indicator {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    padding: 16px 32px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    font-size: 20px;
+    font-weight: 600;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+#gesture-indicator.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(20px);
+}
+
+#gesture-indicator.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    #camera-preview {
+        width: 150px;
+        height: 112px;
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .modal-content {
+        padding: 30px 20px;
+    }
+
+    .modal-content h2 {
+        font-size: 26px;
+    }
+
+    #gesture-guide {
+        top: 10px;
+        left: 10px;
+    }
+
+    .guide-item {
+        padding: 8px 14px;
+    }
+
+    .gesture-icon {
+        font-size: 22px;
+    }
+
+    .gesture-text {
+        font-size: 12px;
+    }
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xuân Trong Tầm Tay - Gesture-based New Year Wish</title>
+    <meta name="description" content="Tạo lời chúc Tết bằng cử chỉ tay với công nghệ AI và đồ họa 3D">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@400;700&family=Be+Vietnam+Pro:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Three.js Canvas -->
+    <canvas id="canvas3d"></canvas>
+
+    <!-- Video for MediaPipe (hidden) -->
+    <video id="webcam" autoplay playsinline></video>
+
+    <!-- Camera Preview (small corner) -->
+    <div id="camera-preview">
+        <canvas id="hand-canvas"></canvas>
+        <div class="camera-label">Camera</div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader">
+            <div class="blossom-loader">🌸</div>
+            <h2>Đang khởi động...</h2>
+            <p>Vui lòng cho phép truy cập camera</p>
+        </div>
+    </div>
+
+    <!-- Setup Modal -->
+    <div id="setup-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <h2>🌸 Xuân Trong Tầm Tay</h2>
+            <p>Nhập tên người nhận lời chúc:</p>
+            <input type="text" id="recipient-name" placeholder="Ví dụ: Bạn Anh" maxlength="20">
+
+            <div class="camera-select">
+                <label for="camera-list">Chọn Camera:</label>
+                <select id="camera-list"></select>
+            </div>
+
+            <button id="test-camera-btn" class="btn-secondary">📷 Bật Camera Trước</button>
+            <div id="camera-status" class="camera-status"></div>
+
+            <button id="start-btn" class="btn-primary" disabled>Bắt Đầu ✨</button>
+        </div>
+    </div>
+
+    <!-- Gesture Guide -->
+    <div id="gesture-guide" class="hidden">
+        <div class="guide-item">
+            <span class="gesture-icon">✋</span>
+            <span class="gesture-text">Xòe tay → Hoa đào nở</span>
+        </div>
+        <div class="guide-item">
+            <span class="gesture-icon">✌️</span>
+            <span class="gesture-text">Hai ngón → Chữ "Phúc"</span>
+        </div>
+        <div class="guide-item">
+            <span class="gesture-icon">🤟</span>
+            <span class="gesture-text">ILY → Chúc Mừng Năm Mới</span>
+        </div>
+    </div>
+
+    <!-- Current Gesture Indicator -->
+    <div id="gesture-indicator" class="hidden">
+        <span id="current-gesture"></span>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Three.js -->
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+    <!-- App Modules -->
+    <script src="js/gestureRecognition.js"></script>
+    <script src="js/handTracking.js"></script>
+    <script src="js/effects/cherryBlossoms.js"></script>
+    <script src="js/effects/calligraphy.js"></script>
+    <script src="js/effects/nameDisplay.js"></script>
+    <script src="js/effects/fireworks.js"></script>
+    <script src="js/cinematicCamera.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
