@@ -10,7 +10,8 @@ const App = {
         currentGesture: 'none',
         lastGesture: 'none',
         isReady: false,
-        handPosition: { x: 0.5, y: 0.5 } // Normalized hand position
+        handPosition: { x: 0.5, y: 0.5 }, // Normalized hand position
+        greetingTimer: null // Timer for auto-hiding greeting
     },
 
     // DOM Elements
@@ -326,6 +327,12 @@ const App = {
     showGreeting(gesture) {
         const greeting = this.gestureGreetings[gesture];
 
+        // Clear any existing timer
+        if (this.state.greetingTimer) {
+            clearTimeout(this.state.greetingTimer);
+            this.state.greetingTimer = null;
+        }
+
         if (greeting && greeting.main) {
             // Update greeting text
             this.elements.greetingText.textContent = greeting.main;
@@ -343,10 +350,27 @@ const App = {
 
             // Hide gesture indicator
             this.elements.gestureIndicator.classList.add('hidden');
+
+            // Auto-hide after 5 seconds
+            this.state.greetingTimer = setTimeout(() => {
+                this.hideGreeting();
+            }, 5000);
         } else {
-            // Hide greeting display
-            this.elements.greetingDisplay.classList.remove('visible');
-            this.elements.greetingDisplay.classList.add('hidden');
+            this.hideGreeting();
+        }
+    },
+
+    /**
+     * Hide greeting message
+     */
+    hideGreeting() {
+        this.elements.greetingDisplay.classList.remove('visible');
+        this.elements.greetingDisplay.classList.add('hidden');
+
+        // Clear timer if exists
+        if (this.state.greetingTimer) {
+            clearTimeout(this.state.greetingTimer);
+            this.state.greetingTimer = null;
         }
     },
 
