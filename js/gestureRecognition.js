@@ -9,7 +9,11 @@ const GestureRecognition = {
         NONE: 'none',
         OPEN_HAND: 'open_hand',      // ✋ 5 fingers extended
         PEACE_SIGN: 'peace_sign',    // ✌️ Index + Middle extended
-        ILY_SIGN: 'ily_sign'         // 🤟 Thumb + Index + Pinky extended
+        ILY_SIGN: 'ily_sign',        // 🤟 Thumb + Index + Pinky extended
+        POINTING: 'pointing',         // 👆 Only index extended
+        FIST: 'fist',                // 👊 All fingers closed
+        THUMBS_UP: 'thumbs_up',      // 👍 Only thumb extended
+        OK_SIGN: 'ok_sign'           // 👌 Thumb + Index form circle
     },
 
     // Finger tip and pip (proximal interphalangeal) landmark indices
@@ -86,6 +90,59 @@ const GestureRecognition = {
     },
 
     /**
+     * Check for pointing gesture (only index finger extended)
+     */
+    isPointing(landmarks) {
+        const extended = this.getExtendedFingers(landmarks);
+        // Only index extended, all others closed
+        return !extended[0] && extended[1] && !extended[2] && !extended[3] && !extended[4];
+    },
+
+    /**
+     * Check for fist gesture (all fingers closed)
+     */
+    isFist(landmarks) {
+        const extended = this.getExtendedFingers(landmarks);
+        // All fingers closed
+        const count = extended.filter(e => e).length;
+        return count === 0;
+    },
+
+    /**
+     * Check for thumbs up gesture (only thumb extended, pointing up)
+     */
+    isThumbsUp(landmarks) {
+        const extended = this.getExtendedFingers(landmarks);
+        // Only thumb extended
+        if (!extended[0] || extended[1] || extended[2] || extended[3] || extended[4]) {
+            return false;
+        }
+        // Check thumb is pointing up (tip y < base y)
+        const thumbTip = landmarks[4];
+        const thumbBase = landmarks[2];
+        return thumbTip.y < thumbBase.y - 0.05;
+    },
+
+    /**
+     * Check for OK sign (thumb and index form a circle)
+     */
+    isOKSign(landmarks) {
+        const extended = this.getExtendedFingers(landmarks);
+        // Middle, ring, pinky should be extended
+        if (!extended[2] || !extended[3] || !extended[4]) {
+            return false;
+        }
+        // Check thumb tip and index tip are close together
+        const thumbTip = landmarks[4];
+        const indexTip = landmarks[8];
+        const distance = Math.sqrt(
+            Math.pow(thumbTip.x - indexTip.x, 2) +
+            Math.pow(thumbTip.y - indexTip.y, 2)
+        );
+        return distance < 0.08; // Close enough to form a circle
+    },
+
+    /**
      * Classify the current gesture
      * @param {Array} landmarks
      * @returns {string} - Gesture type
@@ -95,12 +152,24 @@ const GestureRecognition = {
             return this.GESTURES.NONE;
         }
 
-        // Priority order: ILY > Peace > Open Hand
+        // Priority order: OK > ILY > ThumbsUp > Peace > Pointing > Fist > Open Hand
+        if (this.isOKSign(landmarks)) {
+            return this.GESTURES.OK_SIGN;
+        }
         if (this.isILYSign(landmarks)) {
             return this.GESTURES.ILY_SIGN;
         }
+        if (this.isThumbsUp(landmarks)) {
+            return this.GESTURES.THUMBS_UP;
+        }
         if (this.isPeaceSign(landmarks)) {
             return this.GESTURES.PEACE_SIGN;
+        }
+        if (this.isPointing(landmarks)) {
+            return this.GESTURES.POINTING;
+        }
+        if (this.isFist(landmarks)) {
+            return this.GESTURES.FIST;
         }
         if (this.isOpenHand(landmarks)) {
             return this.GESTURES.OPEN_HAND;

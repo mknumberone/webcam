@@ -14,6 +14,7 @@ const HandTracking = {
     // Callbacks
     onGestureDetected: null,
     onHandsDetected: null,
+    onHandPosition: null,  // New callback for hand position
 
     /**
      * Get available cameras (including mobile)
@@ -151,6 +152,20 @@ const HandTracking = {
             // Callback with hand data
             if (this.onHandsDetected) {
                 this.onHandsDetected(landmarks);
+            }
+
+            // Calculate hand center position (palm center - landmark 0)
+            // Also consider middle finger base (landmark 9) for better center
+            const palmCenter = landmarks[0];
+            const middleBase = landmarks[9];
+            const handCenter = {
+                x: (palmCenter.x + middleBase.x) / 2,
+                y: (palmCenter.y + middleBase.y) / 2
+            };
+
+            // Send hand position
+            if (this.onHandPosition) {
+                this.onHandPosition(handCenter);
             }
 
             // Process gesture

@@ -96,6 +96,79 @@ const Fireworks = {
     },
 
     /**
+     * Create a big burst explosion (for fist gesture)
+     */
+    bigBurst() {
+        // Many more bursts at varied positions
+        const positions = [];
+        for (let i = 0; i < 15; i++) {
+            positions.push(new THREE.Vector3(
+                THREE.MathUtils.randFloatSpread(3),
+                1 + Math.random() * 2,
+                THREE.MathUtils.randFloatSpread(2)
+            ));
+        }
+
+        // Store original config
+        const originalCount = this.config.particleCount;
+        this.config.particleCount = 150; // More particles per burst
+
+        positions.forEach((pos, i) => {
+            setTimeout(() => this.createBurst(pos), i * 100);
+        });
+
+        // Restore after spawning
+        setTimeout(() => {
+            this.config.particleCount = originalCount;
+        }, positions.length * 100 + 50);
+
+        this.isActive = true;
+    },
+
+    /**
+     * Multi-color confetti effect (for OK gesture)
+     */
+    multiColor() {
+        // Neon rainbow colors
+        const neonColors = [
+            0x00ffff, // Cyan
+            0xff00ff, // Magenta
+            0xffff00, // Yellow
+            0x00ff88, // Green
+            0xff6600, // Orange
+            0xbf00ff, // Purple
+            0xff1744  // Red
+        ];
+
+        // Store original colors
+        const originalColors = [...this.config.colors];
+        this.config.colors = neonColors;
+
+        // Create spiral pattern
+        const positions = [];
+        for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 4;
+            const radius = 0.3 + (i / 20) * 1.5;
+            positions.push(new THREE.Vector3(
+                Math.cos(angle) * radius,
+                0.5 + (i / 20) * 2,
+                Math.sin(angle) * radius
+            ));
+        }
+
+        positions.forEach((pos, i) => {
+            setTimeout(() => this.createBurst(pos), i * 80);
+        });
+
+        // Restore original colors after spawning
+        setTimeout(() => {
+            this.config.colors = originalColors;
+        }, positions.length * 80 + 50);
+
+        this.isActive = true;
+    },
+
+    /**
      * Update fireworks
      * @param {number} deltaTime
      */

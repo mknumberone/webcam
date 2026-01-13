@@ -9,7 +9,8 @@ const App = {
         recipientName: '',
         currentGesture: 'none',
         lastGesture: 'none',
-        isReady: false
+        isReady: false,
+        handPosition: { x: 0.5, y: 0.5 } // Normalized hand position
     },
 
     // DOM Elements
@@ -25,15 +26,43 @@ const App = {
         currentGestureEl: null,
         recipientInput: null,
         cameraList: null,
-        startBtn: null
+        startBtn: null,
+        greetingDisplay: null,
+        greetingText: null,
+        greetingSub: null
     },
 
-    // Gesture display names
-    gestureNames: {
-        'none': '',
-        'open_hand': '✋ Hoa Đào Nở',
-        'peace_sign': '✌️ Chữ Phúc',
-        'ily_sign': '🤟 Chúc Mừng Năm Mới'
+    // Gesture greetings - Main text and subtitle
+    gestureGreetings: {
+        'none': { main: '', sub: '' },
+        'open_hand': {
+            main: 'Chúc Mừng Năm Mới',
+            sub: '🌸 Xuân về trên khắp nẻo đường 🌸'
+        },
+        'peace_sign': {
+            main: 'An Khang Thịnh Vượng',
+            sub: '✨ Bình an - Hạnh phúc - Thành công ✨'
+        },
+        'ily_sign': {
+            main: 'Vạn Sự Như Ý',
+            sub: '🎊 Mọi điều tốt đẹp nhất đến với bạn 🎊'
+        },
+        'pointing': {
+            main: 'Phúc Lộc Thọ',
+            sub: '🏮 Tam đa - Phúc lộc tràn đầy 🏮'
+        },
+        'fist': {
+            main: 'Tấn Tài Tấn Lộc',
+            sub: '💰 Năm mới phát tài phát lộc 💰'
+        },
+        'thumbs_up': {
+            main: 'Niên Niên Như Ý',
+            sub: '🎋 Năm năm đều được như ý nguyện 🎋'
+        },
+        'ok_sign': {
+            main: 'Tuế Tuế Bình An',
+            sub: '🌺 Mỗi năm đều bình an vui vẻ 🌺'
+        }
     },
 
     /**
@@ -77,7 +106,10 @@ const App = {
             cameraList: document.getElementById('camera-list'),
             testCameraBtn: document.getElementById('test-camera-btn'),
             cameraStatus: document.getElementById('camera-status'),
-            startBtn: document.getElementById('start-btn')
+            startBtn: document.getElementById('start-btn'),
+            greetingDisplay: document.getElementById('greeting-display'),
+            greetingText: document.querySelector('.greeting-text'),
+            greetingSub: document.querySelector('.greeting-sub')
         };
     },
 
@@ -203,9 +235,6 @@ const App = {
         // Get recipient name
         this.state.recipientName = this.elements.recipientInput.value.trim() || 'Bạn';
 
-        // Setup name display
-        NameDisplay.setName(this.state.recipientName);
-
         // Get selected camera
         const selectedCamera = this.elements.cameraList.value;
 
@@ -232,6 +261,11 @@ const App = {
             this.handleGesture(gesture);
         };
 
+        // Setup hand position callback
+        HandTracking.onHandPosition = (position) => {
+            this.updateHandPosition(position);
+        };
+
         // Start hand tracking
         HandTracking.start();
 
@@ -240,8 +274,24 @@ const App = {
         this.elements.cameraPreview.classList.add('visible');
         this.elements.gestureGuide.classList.remove('hidden');
 
+        // Activate cherry blossoms - always on
+        CherryBlossoms.setActive(true);
+
         this.state.isReady = true;
         console.log('🎉 Experience started for:', this.state.recipientName);
+    },
+
+    /**
+     * Update hand position for cherry blossoms to follow
+     * @param {object} position - {x, y} normalized 0-1
+     */
+    updateHandPosition(position) {
+        if (!this.state.isReady) return;
+
+        this.state.handPosition = position;
+
+        // Update cherry blossoms to spawn around hand position
+        CherryBlossoms.setHandPosition(position.x, position.y);
     },
 
     /**
@@ -257,45 +307,46 @@ const App = {
 
         console.log('Gesture:', gesture);
 
-        // Update gesture indicator
-        this.updateGestureIndicator(gesture);
-
         // Update guide highlighting
         this.updateGuideHighlight(gesture);
 
-        // Trigger effects based on gesture
-        switch (gesture) {
-            case GestureRecognition.GESTURES.OPEN_HAND:
-                this.triggerOpenHand();
-                break;
+        // Show greeting based on gesture
+        this.showGreeting(gesture);
 
-            case GestureRecognition.GESTURES.PEACE_SIGN:
-                this.triggerPeaceSign();
-                break;
-
-            case GestureRecognition.GESTURES.ILY_SIGN:
-                this.triggerILYSign();
-                break;
-
-            case GestureRecognition.GESTURES.NONE:
-                this.resetEffects();
-                break;
+        // Burst cherry blossoms on any gesture change
+        if (gesture !== 'none') {
+            CherryBlossoms.burst();
         }
     },
 
     /**
-     * Update gesture indicator UI
+     * Show greeting message
+     * @param {string} gesture
      */
-    updateGestureIndicator(gesture) {
-        const name = this.gestureNames[gesture];
+    showGreeting(gesture) {
+        const greeting = this.gestureGreetings[gesture];
 
-        if (name) {
-            this.elements.currentGestureEl.textContent = name;
-            this.elements.gestureIndicator.classList.remove('hidden');
-            this.elements.gestureIndicator.classList.add('visible');
-        } else {
-            this.elements.gestureIndicator.classList.remove('visible');
+        if (greeting && greeting.main) {
+            // Update greeting text
+            this.elements.greetingText.textContent = greeting.main;
+
+            // Add recipient name to subtitle
+            let subText = greeting.sub;
+            if (this.state.recipientName && this.state.recipientName !== 'Bạn') {
+                subText = `Gửi đến ${this.state.recipientName} - ${greeting.sub}`;
+            }
+            this.elements.greetingSub.textContent = subText;
+
+            // Show greeting display
+            this.elements.greetingDisplay.classList.remove('hidden');
+            this.elements.greetingDisplay.classList.add('visible');
+
+            // Hide gesture indicator
             this.elements.gestureIndicator.classList.add('hidden');
+        } else {
+            // Hide greeting display
+            this.elements.greetingDisplay.classList.remove('visible');
+            this.elements.greetingDisplay.classList.add('hidden');
         }
     },
 
@@ -310,76 +361,11 @@ const App = {
             if (gesture === 'open_hand' && index === 0) item.classList.add('active');
             if (gesture === 'peace_sign' && index === 1) item.classList.add('active');
             if (gesture === 'ily_sign' && index === 2) item.classList.add('active');
+            if (gesture === 'pointing' && index === 3) item.classList.add('active');
+            if (gesture === 'fist' && index === 4) item.classList.add('active');
+            if (gesture === 'thumbs_up' && index === 5) item.classList.add('active');
+            if (gesture === 'ok_sign' && index === 6) item.classList.add('active');
         });
-    },
-
-    /**
-     * Trigger open hand effect - Cherry Blossoms
-     */
-    triggerOpenHand() {
-        console.log('🌸 Cherry Blossoms activated!');
-
-        // Deactivate other effects
-        Calligraphy.setActive(false);
-        NameDisplay.setActive(false);
-
-        // Activate cherry blossoms
-        CherryBlossoms.setActive(true);
-        CherryBlossoms.burst();
-
-        // Camera effect
-        CinematicCamera.setOrbit(true);
-        CinematicCamera.shake(0.5);
-    },
-
-    /**
-     * Trigger peace sign effect - Calligraphy "Phúc"
-     */
-    triggerPeaceSign() {
-        console.log('✌️ Calligraphy Phúc activated!');
-
-        // Deactivate other effects
-        CherryBlossoms.setActive(false);
-        NameDisplay.setActive(false);
-
-        // Activate calligraphy
-        Calligraphy.setActive(true);
-
-        // Camera effect
-        CinematicCamera.setOrbit(true);
-        CinematicCamera.focusOn(new THREE.Vector3(0, 0.5, 0), 3);
-    },
-
-    /**
-     * Trigger ILY sign effect - New Year Greeting + Name
-     */
-    triggerILYSign() {
-        console.log('🤟 New Year Greeting activated for:', this.state.recipientName);
-
-        // Deactivate other effects
-        CherryBlossoms.setActive(false);
-        Calligraphy.setActive(false);
-
-        // Activate name display
-        NameDisplay.setActive(true);
-
-        // Trigger fireworks
-        Fireworks.celebrate();
-
-        // Camera effect
-        CinematicCamera.setOrbit(true);
-        CinematicCamera.shake(0.8);
-    },
-
-    /**
-     * Reset all effects
-     */
-    resetEffects() {
-        CherryBlossoms.setActive(false);
-        Calligraphy.setActive(false);
-        NameDisplay.setActive(false);
-        CinematicCamera.setOrbit(false);
-        CinematicCamera.resetPosition();
     }
 };
 
